@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINTASBELAJARZACKY</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --neon-purple: #9d4edd;
+    --neon-pink: #e040fb;
+    --neon-blue: #3d5afe;
+    --neon-yellow: #ffd600;
+    --neon-orange: #ff6d00;
+    --dark-bg: #05020f;
+    --grid-line: rgba(100, 60, 255, 0.18);
+    --card-bg: rgba(15, 5, 40, 0.82);
+    --glow-blue: rgba(61, 90, 254, 0.45);
+    --glow-purple: rgba(157, 78, 221, 0.5);
+  }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--dark-bg);
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── STARFIELD ── */
+  #stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    animation: twinkle var(--d) ease-in-out infinite alternate;
+  }
+  @keyframes twinkle {
+    from { opacity: var(--a1); transform: scale(1); }
+    to   { opacity: var(--a2); transform: scale(1.4); }
+  }
+
+  /* ── GRID FLOOR ── */
+  .grid-floor {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 42vh;
+    pointer-events: none;
+    z-index: 1;
+    background:
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(0deg,  var(--grid-line) 1px, transparent 1px);
+    background-size: 60px 60px;
+    transform: perspective(600px) rotateX(55deg);
+    transform-origin: bottom center;
+    mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+  }
+  .grid-glow {
+    position: fixed;
+    bottom: 38vh; left: 50%;
+    transform: translateX(-50%);
+    width: 80vw; height: 4px;
+    background: var(--neon-purple);
+    border-radius: 50%;
+    filter: blur(6px);
+    box-shadow: 0 0 40px 18px var(--neon-purple), 0 0 80px 40px rgba(157,78,221,0.25);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* ── FLOATING CUBES (decorative) ── */
+  .cubes-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .cube {
+    position: absolute;
+    width: 44px; height: 44px;
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 12px var(--neon-blue), inset 0 0 8px rgba(61,90,254,0.3);
+    background: rgba(10,10,60,0.7);
+    border-radius: 6px;
+    animation: floatCube var(--fc) ease-in-out infinite alternate;
+    opacity: 0.7;
+  }
+  .cube::before, .cube::after {
+    content: '';
+    position: absolute;
+    background: var(--neon-blue);
+    opacity: 0.5;
+  }
+  .cube::before { top: 50%; left: 0; right: 0; height: 1px; }
+  .cube::after  { left: 50%; top: 0; bottom: 0; width: 1px; }
+  @keyframes floatCube {
+    from { transform: translateY(0) rotate(0deg); }
+    to   { transform: translateY(-18px) rotate(8deg); }
+  }
+
+  /* ── SHOOTING STARS ── */
+  .shoot {
+    position: fixed;
+    width: 14px; height: 14px;
+    background: var(--neon-yellow);
+    clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+    box-shadow: 0 0 20px var(--neon-yellow), 0 0 40px var(--neon-orange);
+    z-index: 2;
+    pointer-events: none;
+    animation: shootAnim var(--ss) linear infinite;
+    opacity: 0;
+  }
+  @keyframes shootAnim {
+    0%   { opacity: 0; transform: translate(0,0) scale(1); }
+    10%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0.5); }
+  }
+
+  /* ── MAIN CONTENT ── */
+  .wrapper {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 48px 20px 140px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .logo-eyebrow {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    color: var(--neon-purple);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.6rem, 5.5vw, 3.2rem);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 0%, var(--neon-pink) 40%, var(--neon-purple) 70%, var(--neon-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 18px var(--neon-purple));
+    letter-spacing: 0.04em;
+  }
+  .tagline {
+    margin-top: 12px;
+    font-size: 1rem;
+    color: rgba(200,180,255,0.7);
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+  .divider {
+    width: 220px; height: 2px;
+    margin: 20px auto 0;
+    background: linear-gradient(90deg, transparent, var(--neon-purple), var(--neon-pink), var(--neon-blue), transparent);
+    border-radius: 2px;
+    box-shadow: 0 0 14px var(--neon-purple);
+  }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 22px;
+    width: 100%;
+    max-width: 1020px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card-bg);
+    border: 1.5px solid rgba(157, 78, 221, 0.35);
+    border-radius: 14px;
+    padding: 22px 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    cursor: default;
+    backdrop-filter: blur(12px);
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(157,78,221,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .card:hover {
+    transform: translateY(-6px) scale(1.012);
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 24px var(--glow-purple), 0 0 60px rgba(157,78,221,0.15), inset 0 0 20px rgba(157,78,221,0.04);
+  }
+
+  /* card top row */
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .icon-wrap {
+    width: 46px; height: 46px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    background: rgba(30,10,70,0.8);
+    box-shadow: 0 0 12px var(--ic);
+  }
+  .card-meta { flex: 1; }
+  .card-category {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--neon-pink);
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.25;
+  }
+
+  .card-desc {
+    font-size: 0.9rem;
+    color: rgba(200,185,255,0.72);
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  /* button */
+  .btn-open {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1.5px solid var(--neon-purple);
+    background: linear-gradient(135deg, rgba(157,78,221,0.18), rgba(61,90,254,0.12));
+    color: #e8d8ff;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.15s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-open::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(157,78,221,0.35), rgba(224,64,251,0.25));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .btn-open:hover::after { opacity: 1; }
+  .btn-open:hover {
+    color: #fff;
+    box-shadow: 0 0 18px var(--neon-purple), 0 0 36px rgba(157,78,221,0.25);
+    transform: scale(1.04);
+  }
+  .btn-open:active { transform: scale(0.97); }
+  .btn-arrow { font-size: 1rem; transition: transform 0.2s ease; }
+  .btn-open:hover .btn-arrow { transform: translateX(4px); }
+
+  /* corner pixel accent */
+  .card-corner {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 22px; height: 22px;
+    opacity: 0.35;
+  }
+  .card-corner svg rect { fill: var(--neon-blue); }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 60px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(180,160,255,0.4);
+    letter-spacing: 0.12em;
+  }
+</style>
+</head>
+<body>
+
+<!-- Stars -->
+<div id="stars"></div>
+
+<!-- Grid Floor -->
+<div class="grid-floor"></div>
+<div class="grid-glow"></div>
+
+<!-- Floating Cubes -->
+<div class="cubes-layer" id="cubes"></div>
+
+<!-- Shooting Stars -->
+<div class="shoot" style="--ss:4s;left:8%;top:42%;--sx:420px;--sy:120px;animation-delay:0s"></div>
+<div class="shoot" style="--ss:5.5s;right:10%;top:38%;--sx:-380px;--sy:110px;animation-delay:2s"></div>
+
+<!-- Main -->
+<div class="wrapper">
+  <header>
+    <p class="logo-eyebrow">✦ Portal Belajar ✦</p>
+    <h1>LINTASBELAJARZACKY</h1>
+    <p class="tagline">Semua Alat Belajar dalam Satu Portal</p>
+    <div class="divider"></div>
+  </header>
+
+  <div class="grid">
+
+    <!-- 1 -->
+    <div class="card">
+      <div class="card-corner">
+        <svg width="22" height="22" viewBox="0 0 22 22"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="16" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="16" y="8" width="6" height="6"/></svg>
+      </div>
+      <div class="card-top">
+        <div class="icon-wrap" style="--ic:rgba(157,78,221,0.6)">🎨</div>
+        <div class="card-meta">
+          <div class="card-category">Template</div>
+          <div class="card-title">Web Buat PPT</div>
+        </div>
+      </div>
+      <p class="card-desc">Template presentasi profesional siap pakai — tinggal pilih, edit, dan download.</p>
+      <a class="btn-open" href="https://slidesgo.com/" target="_blank" rel="noopener">
+        BUKA SLIDESGO <span class="btn-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- 2 -->
+    <div class="card">
+      <div class="card-corner">
+        <svg width="22" height="22" viewBox="0 0 22 22"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="16" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="16" y="8" width="6" height="6"/></svg>
+      </div>
+      <div class="card-top">
+        <div class="icon-wrap" style="--ic:rgba(61,90,254,0.6)">📚</div>
+        <div class="card-meta">
+          <div class="card-category">Materi</div>
+          <div class="card-title">Belajar Materi</div>
+        </div>
+      </div>
+      <p class="card-desc">Platform belajar materi pelajaran lengkap dan terstruktur untuk semua jenjang.</p>
+      <a class="btn-open" href="https://pintarly.id/" target="_blank" rel="noopener">
+        BUKA PINTARLY <span class="btn-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- 3 -->
+    <div class="card">
+      <div class="card-corner">
+        <svg width="22" height="22" viewBox="0 0 22 22"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="16" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="16" y="8" width="6" height="6"/></svg>
+      </div>
+      <div class="card-top">
+        <div class="icon-wrap" style="--ic:rgba(224,64,251,0.6)">🎬</div>
+        <div class="card-meta">
+          <div class="card-category">Hiburan</div>
+          <div class="card-title">Nonton Bioskop</div>
+        </div>
+      </div>
+      <p class="card-desc">Streaming film dan bioskop online — nonton kapan saja dan di mana saja.</p>
+      <a class="btn-open" href="https://www.streamxtv.net/" target="_blank" rel="noopener">
+        BUKA STREAMXTV <span class="btn-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- 4 -->
+    <div class="card">
+      <div class="card-corner">
+        <svg width="22" height="22" viewBox="0 0 22 22"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="16" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="16" y="8" width="6" height="6"/></svg>
+      </div>
+      <div class="card-top">
+        <div class="icon-wrap" style="--ic:rgba(0,184,212,0.6)">🖼️</div>
+        <div class="card-meta">
+          <div class="card-category">Desain</div>
+          <div class="card-title">Buat Presentasi</div>
+        </div>
+      </div>
+      <p class="card-desc">Canva — buat presentasi visual keren dengan template dan desain drag-and-drop.</p>
+      <a class="btn-open" href="https://www.canva.com/id_id/contoh/" target="_blank" rel="noopener">
+        BUKA CANVA <span class="btn-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- 5 -->
+    <div class="card">
+      <div class="card-corner">
+        <svg width="22" height="22" viewBox="0 0 22 22"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="16" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="16" y="8" width="6" height="6"/></svg>
+      </div>
+      <div class="card-top">
+        <div class="icon-wrap" style="--ic:rgba(255,214,0,0.5)">🧠</div>
+        <div class="card-meta">
+          <div class="card-category">AI Belajar</div>
+          <div class="card-title">Belajar & Merangkum</div>
+        </div>
+      </div>
+      <p class="card-desc">AI pintar untuk belajar sekaligus merangkum materi secara otomatis dan efisien.</p>
+      <a class="btn-open" href="https://pelajarin.ai/dashboard" target="_blank" rel="noopener">
+        BUKA PELAJARIN <span class="btn-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- 6 -->
+    <div class="card">
+      <div class="card-corner">
+        <svg width="22" height="22" viewBox="0 0 22 22"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="16" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="16" y="8" width="6" height="6"/></svg>
+      </div>
+      <div class="card-top">
+        <div class="icon-wrap" style="--ic:rgba(0,230,118,0.5)">🎙️</div>
+        <div class="card-meta">
+          <div class="card-category">Meeting</div>
+          <div class="card-title">Bantu Meeting</div>
+        </div>
+      </div>
+      <p class="card-desc">Fathom — rekam, transkripsi, dan rangkum meeting secara otomatis dengan AI.</p>
+      <a class="btn-open" href="https://fathom.video/home" target="_blank" rel="noopener">
+        BUKA FATHOM <span class="btn-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- 7 -->
+    <div class="card">
+      <div class="card-corner">
+        <svg width="22" height="22" viewBox="0 0 22 22"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="16" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="16" y="8" width="6" height="6"/></svg>
+      </div>
+      <div class="card-top">
+        <div class="icon-wrap" style="--ic:rgba(255,109,0,0.5)">📊</div>
+        <div class="card-meta">
+          <div class="card-category">AI Presentasi</div>
+          <div class="card-title">PPT dari Data Kamu</div>
+        </div>
+      </div>
+      <p class="card-desc">NotebookLM Google — kirim datamu, AI langsung buatkan presentasi yang informatif.</p>
+      <a class="btn-open" href="https://notebooklm.google.com/notebook/30d46b11-30e0-4ee2-9f71-4069ccd7d06f?authuser=3" target="_blank" rel="noopener">
+        BUKA NOTEBOOKLM <span class="btn-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- 8 -->
+    <div class="card">
+      <div class="card-corner">
+        <svg width="22" height="22" viewBox="0 0 22 22"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="16" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="16" y="8" width="6" height="6"/></svg>
+      </div>
+      <div class="card-top">
+        <div class="icon-wrap" style="--ic:rgba(157,78,221,0.6)">⚡</div>
+        <div class="card-meta">
+          <div class="card-category">AI PPT</div>
+          <div class="card-title">AI Buat PPT Presentasi</div>
+        </div>
+      </div>
+      <p class="card-desc">Gamma — buat slide presentasi otomatis pakai AI hanya dengan beberapa kata kunci.</p>
+      <a class="btn-open" href="https://gamma.app/" target="_blank" rel="noopener">
+        BUKA GAMMA <span class="btn-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- 9 -->
+    <div class="card" style="border-color: rgba(224,64,251,0.5); background: rgba(25, 5, 55, 0.88);">
+      <div class="card-corner">
+        <svg width="22" height="22" viewBox="0 0 22 22"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="16" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="16" y="8" width="6" height="6"/></svg>
+      </div>
+      <div class="card-top">
+        <div class="icon-wrap" style="--ic:rgba(224,64,251,0.7)">🤖</div>
+        <div class="card-meta">
+          <div class="card-category">AI Terbaik</div>
+          <div class="card-title">Web AI Terbaik</div>
+        </div>
+      </div>
+      <p class="card-desc">Akses AI paling canggih dan terbaik — bantu jawab semua pertanyaan dan tugas kamu.</p>
+      <a class="btn-open" href="https://share.google/cEMOgjg05sjcmooQc" target="_blank" rel="noopener" style="border-color: var(--neon-pink); box-shadow: 0 0 12px rgba(224,64,251,0.3);">
+        BUKA AI TERBAIK <span class="btn-arrow">→</span>
+      </a>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>✦ LINTASBELAJARZACKY ✦ &nbsp;|&nbsp; Portal Belajar Serba Lengkap</p>
+    <p style="margin-top:6px;font-size:0.65rem;opacity:0.5">Semua link membuka tab baru. Happy Learning! 🚀</p>
+  </footer>
+</div>
+
+<script>
+// ── STARS ──
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 180; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2.2 + 0.5;
+  s.style.cssText = `
+    width:${size}px;height:${size}px;
+    left:${Math.random()*100}%;top:${Math.random()*100}%;
+    --a1:${Math.random()*0.3+0.05};--a2:${Math.random()*0.6+0.3};
+    --d:${(Math.random()*3+1.5).toFixed(1)}s;
+    animation-delay:${(Math.random()*4).toFixed(1)}s;
+  `;
+  starsEl.appendChild(s);
+}
+// Purple-tinted stars
+for (let i = 0; i < 30; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 3 + 1;
+  s.style.cssText = `
+    width:${size}px;height:${size}px;
+    left:${Math.random()*100}%;top:${Math.random()*100}%;
+    background:#c084fc;
+    --a1:0.1;--a2:0.7;
+    --d:${(Math.random()*2+1).toFixed(1)}s;
+    animation-delay:${(Math.random()*3).toFixed(1)}s;
+  `;
+  starsEl.appendChild(s);
+}
+
+// ── CUBES ──
+const cubesEl = document.getElementById('cubes');
+const cubePositions = [
+  {left:'3%',top:'6%'},{left:'6%',top:'28%'},{left:'2%',top:'52%'},
+  {right:'4%',top:'8%'},{right:'7%',top:'22%'},{right:'3%',top:'46%'},
+  {left:'12%',top:'12%'},{right:'13%',top:'14%'}
+];
+cubePositions.forEach((pos, i) => {
+  const c = document.createElement('div');
+  c.className = 'cube';
+  const duration = (3 + i * 0.7).toFixed(1);
+  c.style.cssText = Object.entries(pos).map(([k,v])=>`${k}:${v}`).join(';') + `;--fc:${duration}s;animation-delay:${(i*0.5).toFixed(1)}s`;
+  // Some cubes pink/purple
+  if (i % 3 === 2) {
+    c.style.borderColor = '#e040fb';
+    c.style.boxShadow = '0 0 12px #e040fb, inset 0 0 8px rgba(224,64,251,0.3)';
+  }
+  cubesEl.appendChild(c);
+});
+</script>
+</body>
+</html>
